@@ -1,0 +1,143 @@
+{
+  "System": {
+    "InputFileDir": "D:\\PycharmProjects\\AI\\AnalysisTool\\Input",
+    "OutputFileDir": "D:\\PycharmProjects\\AI\\AnalysisTool\\Output",
+    "Encoding": "utf-8",
+    "Deliminator": {
+      "CSV": ",",
+      "TSV": "\t"
+    },
+    "Header_pos": {
+      "CaseA": 0,
+      "CaseB": 3
+    }
+  },
+  "Analysis_Flags": {
+      "Filter": "True",
+      "FFT": "True",
+      "Wavelet": "True",
+      "Resample": "True"
+  },
+  "Export_Flags": {
+      "Filter": "True",
+      "FFT": "False",
+      "Wavelet": "False",
+      "Resample": "True"
+  },
+  "FilterSetting": {
+      "fpass": 8,
+      "fstop": 12,
+      "gpass": 3,
+      "gstop": 10,
+      "mode": "butter"
+  },
+  "FFTSetting": {
+      "split_t_r": 0.1,
+      "overlap": 0.5,
+      "window_F": {"Primary": "hamming",
+                    "Options": ["hanning", "hamming", "blackman"]
+      }
+  },
+  "ResampleSetting": {
+      "Fs_trans": 33.3
+  },
+  "LabelNames": {
+      "Time": {
+        "ENV1": {
+          "Name": ["Time", "time"],
+          "Unit": "s"
+        },
+        "ENV2": {
+          "Name": ["Time", "time"],
+          "Unit": "s"
+        }
+      },
+      "Signal_1Hz": {
+        "ENV1": {
+          "Name": ["Signal_1Hz"],
+          "Unit": "V"
+        },
+        "ENV2": {
+          "Name": ["Signal_1Hz"],
+          "Unit": "V"
+        }
+    },
+      "Signal_1p05Hz": {
+        "ENV1": {
+          "Name": ["Signal_1p05Hz"],
+          "Unit": "V"
+        },
+        "ENV2": {
+          "Name": ["Signal_1p05Hz"],
+          "Unit": "V"
+        }
+      },
+
+      "Signal_1p1Hz": {
+        "ENV1": {
+          "Name": ["Signal_1p1Hz"],
+          "Unit": "V"
+        },
+        "ENV2": {
+          "Name": ["Signal_1p1Hz"],
+          "Unit": "V"
+        }
+      },
+
+      "Signal_1p5Hz": {
+        "ENV1": {
+          "Name": ["Signal_1p5Hz"],
+          "Unit": "V"
+        },
+        "ENV2": {
+          "Name": ["Signal_1p5Hz"],
+          "Unit": "V"
+        }
+      },
+
+      "Signal_2p0Hz": {
+        "ENV1": {
+          "Name": ["Signal_2p0Hz"],
+          "Unit": "V"
+        },
+        "ENV2": {
+          "Name": ["Signal_2p0Hz"],
+          "Unit": "V"
+        }
+      },
+
+      "Signal_10Hz": {
+        "ENV1": {
+          "Name": ["Signal_10Hz"],
+          "Unit": "V"
+        },
+        "ENV2": {
+          "Name": ["Signal_10Hz"],
+          "Unit": "V"
+        }
+      },
+
+      "Signal_40Hz": {
+        "ENV1": {
+          "Name": ["Signal_40Hz"],
+          "Unit": "V"
+        },
+        "ENV2": {
+          "Name": ["Signal_40Hz"],
+          "Unit": "V"
+        }
+      },
+
+      "Signal_Mix": {
+        "ENV1": {
+          "Name": ["Signal_Mix"],
+          "Unit": "V"
+        },
+        "ENV2": {
+          "Name": ["Signal_Mix"],
+          "Unit": "V"
+        }
+      }
+
+  }
+}

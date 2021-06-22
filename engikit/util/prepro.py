@@ -66,5 +66,18 @@ def AddMulNewColumn(df, labelname, lengthlist, val):
     return df
 
 
+def resample(df, fs, fs_trans, Time, unit = "s"):
+    df[Time] = pd.to_datetime(df[Time], unit = unit)
+    df = df.set_index(Time)
 
+    if fs != 1000:
+        df = df.resample('1ms').interpolate()
+    else:
+        trans_dt = 1 / fs_trans
+        trans_dt_ms = int(trans_dt * 1000)
+        df = df.asfreq(str(trans_dt_ms) + 'ms')# Resampling
+        df = df.resample(str(trans_dt_ms) + 'ms').interpolate()
+        df.reset_index(inplace = True)
+        df[Time] = df[Time].astype('int64' / 10 ** 9) # ns -> s
 
+    return df

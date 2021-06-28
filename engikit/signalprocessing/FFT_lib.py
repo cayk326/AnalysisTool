@@ -4,6 +4,17 @@ from scipy import fftpack
 
 #オーバーラップ処理
 def overlap(data, samplerate, Fs, overlap_rate):
+    '''
+    入力データに対してオーバーラップ処理を行う
+    :param data: 入力データ
+    :param samplerate: サンプリングレート[Hz]
+    :param Fs: フレームサイズ
+    :param overlap_rate: オーバーラップレート[%]
+
+    :return:
+        :array: オーバーラップ加工されたデータ
+        :N_ave:　オーバーラップ加工されたデータの個数
+    '''
     Ts = len(data) / samplerate         #全データ長
     Fc = Fs / samplerate                #フレーム周期
     x_ol = Fs * (1 - (overlap_rate/100))     #オーバーラップ時のフレームずらし幅
@@ -21,7 +32,7 @@ def overlap(data, samplerate, Fs, overlap_rate):
 def window_func(data_array, Fs, N_ave, mode):
     '''
     入力データに対して窓関数を適用する
-    FFTのデータ分割及びおーばラップ処理で使用する。
+    FFTのデータ分割及びオーバーラップ処理で使用する。
     データを分割すると切り出した部分で波形が急に変化する。
     これを抑えるために窓関数を適用。
     ただし、窓関数を適用すると信号が減衰するため、補正処理を適用する
@@ -29,7 +40,10 @@ def window_func(data_array, Fs, N_ave, mode):
     :param Fs: フレームサイズ
     :param N_ave: 分割データ数
     :param mode: 適用する窓関数の種類
+
     :return:
+        :data_array: 窓関数が適用されたデータ
+        :acf: 窓関数補正値
     '''
     if mode == "hanning":
         window = signal.windows.hann(Fs)  # ハニング
@@ -57,7 +71,6 @@ def window_func(data_array, Fs, N_ave, mode):
     return data_array, acf
 
 
-
 #FFT処理
 def fft_average(data_array,samplerate, Fs, N_ave, acf, mode):
     '''
@@ -71,8 +84,9 @@ def fft_average(data_array,samplerate, Fs, N_ave, acf, mode):
 
 
     :return:
-        :fft_array: フーリエスペクトル
-
+        :fft_array: フーリエスペクトル(平均化、正規化及び窓補正済み)
+        :fft_spectrum_mean_out: ナイキスト周波数まで抽出したスペクトル(スペクトルの種類は解析モードによる)
+        :fft_axis_out: ナイキスト周波数まで抽出した周波数軸
 
     '''
     fft_array = []
@@ -104,6 +118,21 @@ def fft_average(data_array,samplerate, Fs, N_ave, acf, mode):
 
 
 def FFT_main(t, data, split_rate, samplerate, overlap_rate, window_mode, analysis_mode):
+    '''
+    FFTを実施するメインコード
+    :param t: 時間データ
+    :param data: 時間データに対する信号のテータ
+    :param split_rate: 全体のデータ長に対してどのくらいの割合で分割するか
+    :param samplerate: サンプリングレート[Hz]
+    :param overlap_rate: オーバーラップ率[%]
+    :param window_mode: 窓関数の種類
+    :param analysis_mode: 解析モードの種類
+    :return:
+        :fft_array: フーリエスペクトル(平均化、正規化及び窓補正済み)
+        :fft_spectrum_mean_out: ナイキスト周波数まで抽出したスペクトル(スペクトルの種類は解析モードによる)
+        :fft_axis_out: ナイキスト周波数まで抽出した周波数軸
+
+    '''
     print("Execute FFT")
     Fs =   int(len(t) * split_rate)# フレームサイズ
 

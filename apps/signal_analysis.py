@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
 import pandas as pd
 import sys
-from AnalysisTool.engikit.signalprocessing import FFT, wavelet, filter
+from AnalysisTool.engikit.signalprocessing import FFT_lib, wavelet, filter, FFT_lib
 from AnalysisTool.engikit.util import  prepro, grabinfo
 
 class Analyzer:
@@ -13,7 +13,7 @@ class Analyzer:
         self.all_files_path = None
 
 
-    def filtering(self, df, samplingrate, labellist):
+    def filtering(self, df, samplerate, labellist):
         filtered_df = df.copy()
         if self.config["FilterSetting"]["mode"] == "butter":
             for idx, labelname in enumerate(labellist):
@@ -21,8 +21,8 @@ class Analyzer:
                                                               fstop=self.config["FilterSetting"]["fstop"],
                                                               gpass=self.config["FilterSetting"]["gpass"],
                                                               gstop=self.config["FilterSetting"]["gstop"],
-                                                              fs=1 / samplingrate,
-                                                              dt=samplingrate,
+                                                              fs=1 / samplerate,
+                                                              dt=samplerate,
                                                               checkflag=False,
                                                               labelname=labelname)
         return filtered_df
@@ -45,23 +45,22 @@ class Analyzer:
         return
 
 
-
-
-
     def analysis(self, signals_df, path):
         header_name = [header for header in self.config["GenLabelNames"].keys()]
         analysis_label = header_name.copy()
         Time = analysis_label.pop(0)#Timeラベルのみ抽出
 
         sample_time = signals_df[Time][1] - signals_df[Time][0]
-        split_t_r = self.config["FFTSetting"]["split_t_r"]
-        overlap = self.config["FFTSetting"]["overlap"]
-        window_F = self.config["FFTSetting"]["window_F"]["Primary"]
+        delta_f = self.config["FFTSetting"]["delta_f"]
+        overlap_rate = self.config["FFTSetting"]["overlap_rate"]
+        window_mode = self.config["FFTSetting"]["window_mode"]["Primary"]
         y_label = "acceleration"
         y_unit = "^(2)"
-        Fs = int(1 / sample_time)
-        Fs_trans = self.config["ResampleSetting"]["Fs_trans"]
+        samplerate = int(1 / sample_time)
+        samplerate_trans = self.config["ResampleSetting"]["samplerate_trans"]
 
+
+        OUTPUT_PATH = self.config["System"]["OutputFileDir"]
 
         # ----- Filtering ----- #
         if eval(self.config["Analysis_Flags"]["Filter"]):
@@ -77,21 +76,31 @@ class Analyzer:
 
 
         # ----- FFT ----- #
-        fq_ave, F_abs_amp_ave = {}, {}
+        #fft_spectrum_mean_out, fft_axis_out = [], []
+        FFT_result_df = {}
+        fft_array, fft_axis_out, fft_spectrum_mean_out, final_time = [], [], [], 0
+
+        Fs = int(samplerate / delta_f)
+
         if eval(self.config["Analysis_Flags"]["FFT"]):
             for label in analysis_label:
-                fq_ave['f_'+label], F_abs_amp_ave['PSD_'+label] = FFT.FFT_main(signals_df[Time], signals_df[label], sample_time, split_t_r, overlap, window_F,
-                                                                               self.config["System"]["OutputFileDir"] + "\\" + label + "_FFT", label, y_unit)
-                print('Analyzing for ' + label + '...')
+                print('FFT Analyzing for ' + label + '...')
+                fft_array, fft_axis_out, fft_spectrum_mean_out, final_time = FFT_lib.FFT_main(signals_df[Time].to_list(), signals_df[label].to_list(), Fs, samplerate, overlap_rate, window_mode, "AMP")
+                FFT_result_df['f_' + label], FFT_result_df['PSD_' + label] = fft_axis_out, fft_spectrum_mean_out
 
-        FFT_result_df = pd.concat([pd.DataFrame(fq_ave),pd.DataFrame(F_abs_amp_ave)], axis='columns')
-        FFT_result_df.to_csv('FFT_result.csv')
+                FFT_lib.plotting(fft_array, fft_axis_out, fft_spectrum_mean_out, final_time, samplerate,
+                                 signals_df[Time].to_list(), signals_df[label].to_list(), label + "_Spectrogram", OUTPUT_PATH + "\\FFT")
 
 
+        FFT_result_df = pd.DataFrame(FFT_result_df)# Data Frame化する
+        FFT_result_df.to_csv((path.replace("Input", "Output\\FFT")).replace(".csv", "_FFT.csv"), index=False)
+
+        '''
         if eval(self.config["System"]["Export_Flags"]["Resample"]):
             print("Resampling")
             resample_df = output_df.copy()
             resample_df = ""
+        '''
 
 
 

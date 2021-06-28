@@ -215,6 +215,39 @@ def FFT_main_corr(t, data, Fs, samplerate, overlap_rate, window_type, correction
     return fft_array, fft_axis_out, fft_spectrum_mean_out, final_time
 
 
+def plotting(fft_array, fft_axis_out, fft_spectrum_mean_out, final_time, samplerate, t, data, title, path):
+    import matplotlib.pyplot as plt
+    fft_array = fft_array.T
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+
+    # データをプロットする。
+    im = ax1.imshow(fft_array,
+                    vmin=0, vmax=np.max(fft_array),
+                    extent=[0, final_time, 0, samplerate],
+                    aspect='auto',
+                    cmap='jet')
+
+    # カラーバーを設定する。
+    cbar = fig.colorbar(im)
+    cbar.set_label('Amplitude [V]')# Sound Pressure[Pa]やAcceleration[m/s^2]など用途に応じて
+
+    # 軸設定する。
+    ax1.set_xlabel('Time [s]')
+    ax1.set_ylabel('Frequency [Hz]')
+
+    # スケールの設定をする。
+    ax1.set_xticks(np.arange(0, np.max(t), 1))# 1秒ごと。サンプリングレートに応じて何秒ごとにticksするか考えること
+    ax1.set_yticks(np.arange(0, samplerate, 10))# 0から最大周波数。もしくは解析周波数の上限値
+    ax1.set_xlim(0, np.max(t))
+    ax1.set_ylim(0, samplerate / 2)
+    plt.savefig(path + "\\" + title, dpi=300)
+    # グラフを表示する。
+    #plt.show()
+    #plt.close()
+
+
+
 if __name__ == '__main__':
     '''
     from matplotlib import pyplot as plt
@@ -267,38 +300,10 @@ if __name__ == '__main__':
     # 開始周波数f0, 停止周波数f1, 停止時間t1、スイープ手法method(linear, logarithmicなど)
     data = signal.chirp(x, f0=1, f1=500, t1=5, method='linear')
 
-    fft_array_out, fft_axis_out, fft_spectrum_mean_out, final_time = FFT_main_corr(x, data, Fs, samplerate, overlap_rate, "hanning", "Simple")
+    fft_array, fft_axis_out, fft_spectrum_mean_out, final_time = FFT_main_corr(x, data, Fs, samplerate, overlap_rate, "hanning", "Simple")
 
 
-    # スペクトログラムで縦軸周波数、横軸時間にするためにデータを転置
-    fft_corr_array_out = fft_array_out.T
-
-    # ここからグラフ描画
-    # グラフをオブジェクト指向で作成する。
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-
-    # データをプロットする。
-    im = ax1.imshow(fft_corr_array_out,
-                    vmin=0, vmax=np.max(fft_corr_array_out),
-                    extent=[0, final_time, 0, samplerate],
-                    aspect='auto',
-                    cmap='jet')
-
-    # カラーバーを設定する。
-    cbar = fig.colorbar(im)
-    cbar.set_label('SP [Pa]')
-
-    # 軸設定する。
-    ax1.set_xlabel('Time [s]')
-    ax1.set_ylabel('Frequency [Hz]')
-
-    # スケールの設定をする。
-    ax1.set_xticks(np.arange(0, 50, 1))
-    ax1.set_yticks(np.arange(0, 20000, 200))
-    ax1.set_xlim(0, 5)
-    ax1.set_ylim(0, 1000)
-
-    # グラフを表示する。
-    plt.show()
-    plt.close()
+    title = "Test_Spect"
+    path = "D:\\PycharmProjects\\AI\\AnalysisTool\\Output\\FFT"
+    plotting(fft_array, fft_axis_out, fft_spectrum_mean_out, final_time, samplerate, x, data, title, path)
+    print()

@@ -82,6 +82,7 @@ class Analyzer:
 
         Fs = int(samplerate / delta_f)
 
+        
         if eval(self.config["Analysis_Flags"]["FFT"]):
             for label in analysis_label:
                 print('FFT Analyzing for ' + label + '...')
@@ -94,6 +95,8 @@ class Analyzer:
 
         FFT_result_df = pd.DataFrame(FFT_result_df)# Data Frame化する
         FFT_result_df.to_csv((path.replace("Input", "Output\\FFT")).replace(".csv", "_FFT.csv"), index=False)
+
+        resample_df = prepro.resample(output_df, samplerate, 1000, Time, "s")
 
         '''
         if eval(self.config["System"]["Export_Flags"]["Resample"]):

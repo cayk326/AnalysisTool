@@ -67,17 +67,26 @@ def AddMulNewColumn(df, labelname, lengthlist, val):
 
 
 def resample(df, fs, fs_trans, Time, unit = "s"):
+    '''
+
+    :param df:入力データ
+    :param fs: サンプリング周波数
+    :param fs_trans: 変換後サンプリング周波数
+    :param Time: 時刻情報のラベル名
+    :param unit: 時刻の単位
+    :return:
+    '''
     df[Time] = pd.to_datetime(df[Time], unit = unit)
     df = df.set_index(Time)
 
     if fs != 1000:
         df = df.resample('1ms').interpolate()
-    else:
-        trans_dt = 1 / fs_trans
-        trans_dt_ms = int(trans_dt * 1000)
-        df = df.asfreq(str(trans_dt_ms) + 'ms')# Resampling
-        df = df.resample(str(trans_dt_ms) + 'ms').interpolate()
-        df.reset_index(inplace = True)
-        df[Time] = df[Time].astype('int64' / 10 ** 9) # ns -> s
+
+    trans_dt = 1 / fs_trans
+    trans_dt_ms = int(trans_dt * 1000)
+    #df = df.asfreq(str(trans_dt_ms) + 'ms')# Resampling
+    df = df.resample(str(trans_dt_ms) + 'ms').interpolate()# 線形補完する
+    df.reset_index(inplace = True)
+    df[Time] = df[Time].astype('int64') / 10 ** 9# ns -> s
 
     return df
